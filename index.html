@@ -1,1 +1,733 @@
-hellow lamelamb
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<title>阅读器</title>
+		<script type="text/javascript" src="lib/zepto.min.js" ></script>
+		<script>
+			// 见jquery 指向zepto.min.js ，这样后面2个基于jquey 的插件就不会报错，找不到juery
+			  window.jQuery = $;
+		</script>
+		<script type="text/javascript" src="js/jquery.base64.js" ></script>
+		<script type="text/javascript" src="js/jquery.jsonp.js" ></script>
+	</head>
+        <style>
+             *{ 
+              margin:0;
+              padding:0;
+                }  
+              .box{
+              	 width:100% ;
+              	 height: 667px;             	 
+              	 position: relative;
+              } 
+              #clickMask{
+              	    position: fixed;
+				    width: 80%;
+				    height: 60%;
+				    top: 15%;
+				    left: 10%;
+				    background: rgba(0,0,0,0);
+				    z-index: 10;
+              }
+              #header{
+              	 width: 100% ;
+              	 height: 60px;
+              	 box-sizing: border-box;
+              	 position: fixed;
+              	 top:0 ;
+              	 left: 0;
+              	 padding: 20px;
+              	 background: rgba(0,0,0,0.9);
+              	 display: none;
+              	 z-index: 10;
+              }
+              #header span{
+              	 color:white ;
+              	 display: inline-block;
+              	 vertical-align: middle;
+              	 margin-right:  20px;
+              }
+              #header span:first-of-type{
+              	 width: 23px;
+				height: 23px;
+				background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyNpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChNYWNpbnRvc2gpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOkJGMkEyQkQxMjdBNDExRTU4NjA2QTJDMjFDQ0I0ODhEIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOkJGMkEyQkQyMjdBNDExRTU4NjA2QTJDMjFDQ0I0ODhEIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6QkYyQTJCQ0YyN0E0MTFFNTg2MDZBMkMyMUNDQjQ4OEQiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6QkYyQTJCRDAyN0E0MTFFNTg2MDZBMkMyMUNDQjQ4OEQiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4Ia560AAAHWklEQVR42uyd7W9U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);
+				background-size: contain;				
+              	 }
+              	 #upNdown{
+              	 	display: inline-block;
+              	 	width:15%;
+              	 	height: 10%;
+              	 	position: fixed;
+              	 	top:75% ;
+              	 	right: 0;
+              	 	background-size:  contain;
+              	 	z-index: 10;
+              	 }
+              	  .down{
+              	 	background-image: url(img/arrowDown.png) ;
+              	 }
+              	   .up{
+              	 	background-image: url(img/arrowUp.png) ;
+              	 }
+              #content{
+              	 font-size: 16px;
+              	 padding: 10px 5px;
+              	 background: lightcyan; 
+              	 text-align: left; 
+              	 letter-spacing: 2px;
+              	 position: relative;
+              }     
+              #content #words h4{
+              	 text-align: center;
+              	 padding: 0 0 5px 0;
+              	 border-bottom: 1px solid black;
+              }
+              #content #words p{
+              	text-indent: 2em;
+              	margin-top: 5px;
+              } 
+              #content #chapters{
+              	 position: absolute;
+              	 top:0 ;
+              	 left: 0;
+              	 transition: .5s;
+              	 transform: translateX(-100%);
+              	 width: 100%;
+              	 min-height: 100%;
+              	 /* 初始化的时候给一个很小的值，为了不把box 撑开*/
+              	 height:375px;
+              	 overflow: hidden;
+              	 background: rgba(0,0,0,1);
+              	 z-index: 20;
+              }
+              #chapters #title{
+              	 text-align: center;
+              	 font-size: 19px;
+              }
+              #chapters span{
+              	display: block;
+              	width:100%;
+              	font-size: 16px;
+              	line-height: 25px;
+              	padding: 2px 0;
+              	height: 21px;
+              	color: rgba(240,240,255,.9);
+              }
+              #maskOfchapterBox{
+              	  position: absolute;
+              	  width: 35%;
+              	  min-height: 100%;
+              	  top:  0 ;
+              	  right:-40%;
+              	  transform:translate(-100%);
+              	  z-index: 21;
+              	  background: lawngreen;
+              }
+              #page{
+              	 height:40px;
+              	 text-align: center;
+                 font-size:30px;
+              }
+              #page span{
+              	 line-height: 40px;
+              }
+              #controles{
+              	width:100% ;
+              	background: rgba(0,0,0,0.9);
+              	position: fixed;
+              	bottom: 0px; 
+              	left: 0;    
+              	display: none; 
+              	z-index: 10;       
+              }
+               #controles .action{
+               	  padding: 10px 15px;
+               	  color:white;
+               	  
+               }
+              .action .fBox{
+              	 text-align: left;
+              	 font-size:20px;
+              	 display: none;
+              }
+              .fBox .fontsize{
+              	  line-height: 30px;
+              	  padding: 15px 0;
+              }
+              .fontsize span{
+              	  display: inline-block;
+              	  border: 1px solid white;
+              	  border-radius: 15px;
+              	  width: 120px;
+              	  height: 30px;
+              	  font-size:14px;
+              	  line-height: 30px;
+              	  margin-right: 14px;
+              	  cursor:pointer;
+              	  text-align: center;
+              }
+              .fontsize span:first-child{
+              	 border: none;
+              	 width: 40px;
+              	 font-size: 20px;
+              	 cursor:none;
+              }
+              .fBox .bgColor{
+              	  line-height: 30px;
+              	  padding: 15px 0;
+              }
+              .bgColor span{
+              	  display: inline-block;
+              	  border: 1px solid white;
+              	  border-radius: 50%;
+              	  width: 30px;
+              	  height: 30px;
+              	  font-size:14px;
+              	  line-height: 30px;
+              	  margin-right: 14px;
+              	  text-align: center;
+              	  cursor:pointer;
+              	  vertical-align: middle;
+              }
+              .bgColor span:first-child{
+              	 border: none;
+              	 width: 40px;
+              	 cursor:none;
+              	 font-size: 20px;
+              }
+              #controles   .actionName{
+              	    height: 80px;
+              		box-sizing: border-box;
+              		text-align: left;
+              		color: white;  
+              		padding: 0 16px;            		
+              		
+              } 
+            .actionName div{
+              	display: inline-block;
+                width:32%;
+                height:80px;
+                font-size: 20px;
+                cursor: pointer;
+                text-align: center;
+                padding: 10px 0 20px 0;
+                box-sizing: border-box;
+              } 
+              .actionName div span{
+              	display: inline-block;
+              }
+              .actionName .category span{
+              	 display: inline-block;
+              }
+              .category span:first-child{
+              	 width:25px;
+              	 height: 23px;
+               background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADUAAAAoCAYAAABerrI1AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyNpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChNYWNpbnRvc2gpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOkNFN0E3M0IwMjc4NDExRTU5RkYxQjg1Rjk2QkEyNzBEIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOkNFN0E3M0IxMjc4NDExRTU5RkYxQjg1Rjk2QkEyNzBEIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6N0M1ODVCRkYyNzg0MTFFNTlGRjFCODVGOTZCQTI3MEQiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6N0M1ODVDMDAyNzg0MTFFNTlGRjFCODVGOTZCQTI3MEQiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz5uTX6PAAAA0UlEQVR42uyXsQrCMBRFX4p0V39Pv8FJcekHFJe6d+v3NY6CDvUFooQ0AcEllnPhlgz3QU6bBq6ZnvdaRC7qndqoB/VR/ZC5wuxGytLtvXejUJ0uDlGgVZ8Tg6lsaWod1Jh461a9TQyMBX6hWLaSBary5zBWn8kPf8DUr/Rx8hfEPth4kxkIs+tCL4rG/VOLPH5AAQUUUEABBRRQv0O54nf1tcL6dZ3Jh9mpMH/2TkmkJFISKYmURKCAAgoooIACCihKIiWRkkhJpCR+XxJfAgwA/ROhOlYvoWQAAAAASUVORK5CYII=
+);
+               background-size: contain;
+              }     
+              .category span:last-child{
+              	  width:100%;
+              	  height:20px;              
+              }    
+              .font span:first-child{
+              	width:25px;
+              	height: 23px;  
+              	background-image:url(
+data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEYAAAAuCAYAAACViW+zAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyNpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChNYWNpbnRvc2gpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjBCRTkzQUQ3Mjc4NzExRTU5RkYxQjg1Rjk2QkEyNzBEIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjBCRTkzQUQ4Mjc4NzExRTU5RkYxQjg1Rjk2QkEyNzBEIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6Q0U3QTczQkEyNzg0MTFFNTlGRjFCODVGOTZCQTI3MEQiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6MEJFOTNBRDYyNzg3MTFFNTlGRjFCODVGOTZCQTI3MEQiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz6/hjRDAAAFqklEQVR42uRaaWwVVRi9fTbYqoBoEGIVrDsBA6JRAY0VSkQUl7pQI8YQGjTRaNCgBtdoApho3aoRRJaIC25/VBTBCiqCuKX+QDFqFANRsRCtsRWr9XzxNBnu++6bO/fNe9i+k5y0c2fmzrwz3/22mbKuv9pNChgCLgLHgBvABnCr6Qkor1CHy1ISZjVYG9leC55V6sLsB/4ucynj7T1VmEwKU09VRBHUmx6MNIS5JuF4SQhzIniKY5+MjypVYa4OtKb/PfJxvn3B7eABOY4Rp3wo2FZKzndajCiG+68otaWkLaP23rKcQoWRDHekMj5DGZPjTisVYWYqY+vB5/g3qZPuFcIMYFJn4wnrr50EDujtwlwFVlpjreBL/P9lbkdRyfMKBcmn7gRfAbeAO8G/wS7yT3Ab+AHYBF4I7ptmuJbUfzN4vDXeCN4U2X4AvNE65gtwOG80rYc6ndcdFnD+DnAe+ChCdme+wpzJyjmKLgr1VWTsOAph11A14LoURBkKrgBPTWGu98CLIE5rPktJC73NliiG5vxOgUK3WN3GlEQRnAG+Zjo7+oQKMxCsU8YXOI7XnHAd5wnFQeAb4GBl37fgXeDp4CGS09Jiy+hPxMoud0RNSSduDV1Kt4DzrbEfecHdyvHyBKSLN8galxu4L1CYp5lxRyGO9WbwcbDT00/OtYVg2VKFJdWWxGIyjtxliUMUw/HFjhwoJBqOVMoLuca54COeonT7xDmMUHbtV5d0KU0Ej7TG/gEXxpy3kMdFIfPUBghzneLMJUS/HTCXiPOYMl6bVBgtc30T/C7mPNm/KgUnvA94iTX2Cy0lFO87rNJbmCpwiqdz9XXCUzivLyqZK21g4tadSObTU96q5FSHJxFmBj18FD8wOvhgJY/fowviKDhz9XXuBccy4kg/eWkKofo3a/tAX2HkBzQo44sSODs57illvEER3Ac7mdxtTEGY/UNrpXOi5hXzQ3NBE1LmnbyXasSTafHlocJoTvJVFmRJsI3n7a12xCD6tfnM0j8CJ4UWkUeA3yjinQ2+FXBzkxS/JKH8KI/o5oP+4LHgMWA177+a20O8ZymvKDMxa9yViK1Kue0xkwlXyLmy1M/jw6pO08RcFiPp/PeOmiRt5CorcvWEbgePDrzmbpYld7gsxiXMpeALRXSGl4Evei6XpWw0JcEf7CN9Bn4Ivs4H0pVUmDXghCIK0+xxvT70UeMd+yXx+5RhfDOrbXH68u5rV47SwFsYcWBfFrDJVKP0arRmlw2tKyj4GnwYfJY5TtKaSRUm4wihtigi1LspWcc6zme3AnKFbnGs1yo/ai4bV00BogyM8+xRVBi9ab3ApNer7XI0t7Qmezemm+zm9f3gbQmddhQnJBFGKtiDrTFZa8tS9inLlAJQrnux4/gJSu10T573MD6JMFqmuyKH8wrFLkfUc7Ujhlvbn1Cc4DTF6O/GVGFGgOMczaZCQFtO4xQTzzBM21acD+rjcqBMzNNqYQ+kEJB5P/eon6RssD8jGWb0z9t8cBj4oE9aLZDPNaZ5PtU0oTWxtM9LWqxtyZTPD7ievO9abbIb9JHeQUcmKsxUxVxlDS8vsDDLFV/R32R/2LhSOfdJ4/8VhfRdZoEfmz3fomoRbXBUGG0ZPWMK/yVUGxOzuOW0mGm9nYes531eQCvqXl7lrNrr2QuSNmajZYm/gjco1x7RnfkOdZT9o1lbFBqjGWW0pC56X9czw42DtCv7xvig7VyKP5vsL9gfQvY7Syymw2S/4thUJFEM65tNisO1I4+8EZjnkWj2ixFFLHQUH4b0ordY+6+En+knwvzElDoaCmeb4mK2JUQT78vGHPZeWhLOL3M/D55k/ntptyOy724l0WyMFpE1jO3NrEyLDVk6E1lIrvU4fgxFGkv/UsWSQnxHK5dhC/3QGqe/dHy1+a8AAwCKR08FSRIHxQAAAABJRU5ErkJggg==
+);            
+              background-size: contain;
+                background-position: 0px 2px;
+              background-repeat:no-repeat;
+              }
+              .font span:last-child{
+              	width:100%;
+              	height: 20px;              
+              }
+              .nightOrday span:first-child{
+              	width:25px;
+              	height: 23px;  
+              	background-image:url(
+data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyNpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChNYWNpbnRvc2gpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOkU2OUYzRUEwMjc4NzExRTU5RkYxQjg1Rjk2QkEyNzBEIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjhBMzA2RjA2Mjc4QTExRTU5RkYxQjg1Rjk2QkEyNzBEIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6RTY5RjNFOUUyNzg3MTFFNTlGRjFCODVGOTZCQTI3MEQiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6RTY5RjNFOUYyNzg3MTFFNTlGRjFCODVGOTZCQTI3MEQiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4v5YACAAAC/UlEQVR42tSaXYhNURTH97kzRnJ9ZTQzPh7IMEr5yshHEwkRkSeSjweEiMjDePTkhcKLPCApUV54GxTKcDM0JfL9QE0UGdcdEmb7L3edOq5zzz1nn332Pvdfv5e5Z9Zd666711577etIKYUGjQILwRwwDOwDfcKAamP873CwBawDrcABP8ACU87/FWUgIk3gKMjL/7VfwV4sojxcCw6AL9JfD0DGdABhv0KTwAUwO+CZvaBfGFaYAJaDyyAb8Mwt0CksKFPh9W3gWgXnSSeFJTkBZXQrOM3VJUi9oJErUGoysBKcCuE86YYt58sF0MILtiakjTvCojI+i/o876Zh9ThNARysUCr99NpmAN5FTAvxBRgS0QZlK5+GDLQrOC9sOu/NADVm70LU+9RmYJOi8yLigk8sgPUxbEy0HUATH0RUNdV2AG0hd9xyarMdwNyYNhaDOpsBTI5pYwRYYTMAHYtwh80ARmqws1ShBdEWwGAdGyI4HrMYKAegawFSMdhlo5XIK/ZAfvoO5oFukxn4oNHeID5DjzUZwCvNNsn5DjDOVADPErA7BdwF0xP2v4YCyCVknDJwjxe2k8AHT4O0VTSeawD9Mll1glZN48T5IMc+N7p/7JJm1AFWg4ERna4Da8F1j62cdzZKY5RZBtbcEuYzuAlugyfgOSjwyS7LJ8QJYJoojuuX+RycLnqPlPXgLZfBalCB11iveyL7CM6K6tEZURxp/jNWGc2pzFbBp98M3peOVXrA4Sr49I+4zpdmgDSA94UZKXX+ITeNP8sFIDg9XWBoypyni0O6THzqN1bx6iXYCH6nyHnyZXOp8+UCIF0Fe1LiPH1FdoMr/q8G74DbwS9pT/TeO+Nes64JuFpNUl+5fdByT9wMHhl0vhu06L7opobqEPiWoON9oJ0v1bXf1LuMAcdAQbPjJ6g9juqPE+PXKvVcbjeAmQqHFsmb5iVwzu1tVKYSOkpdA1jEU246To4XxZ/gZLlUU5v8CbzhI+x9bqV74r7xHwEGAPDRVwnecW5KAAAAAElFTkSuQmCC
+);
+              background-size: contain;
+              background-repeat:no-repeat;
+              }
+              .nightOrday span:last-child{
+              	width:100%;
+              	height: 20px;              
+              }
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              /*当前背景颜色*/
+              .bgColorActive{
+              	  box-shadow: orangered 0px 2px 8px, 
+              	               orangered 0px -2px 8px, 
+              	                orangered 2px 0px 8px, 
+              	                orangered 2px 0px 8px;
+              }
+              .controlesActive{
+              	  color: orangered;
+              	  font-weight: bold;
+              }
+        </style>
+	<body>
+		<div class="box">
+			<div id="header">
+				<span></span>
+				<span>返回书架</span>
+			</div>
+			<div id="clickMask"></div>
+			<div id="upNdown" class="down"></div>
+			<div id="content">	
+				<div id="words"></div>
+				<div id="chapters" style="transition: .5s; transform: translateX(-100%);">
+					<span id="title">目录</span>
+					<div id="chapterBox">						
+					</div>
+					<div id="maskOfchapterBox"></div>
+				</div>
+			</div>
+			<div id="page">
+				<span id="prevPage">上一页</span>
+				<span id="nextPage">下一页</span>
+			</div>
+			<div id="controles">
+				<div class="action">				
+					<div  class="fBox">
+						<div class="fontsize">
+							<span>字号</span>
+						    <span>大号</span>
+						    <span>小号</span>
+						</div>
+						<div class="bgColor">
+							<span>背景</span>
+						    <span style="background-color: lightblue;" ></span>
+						    <span style="background-color: lightcoral;"></span>
+						    <span style="background-color: lightcyan;" class="bgColorActive"></span>
+						    <span style="background-color: lightgoldenrodyellow;"></span>
+						    <span style="background-color: lightgreen;"></span>
+						</div>
+					</div>					
+				</div>
+				<div class="actionName">
+					<div class="category ">
+						<span></span>
+						<span>目录</span>
+					</div>
+					<div  class="font controlesActive">
+						<span></span>
+						<span>字体</span>
+					</div>
+					<div  class="nightOrday">
+						<span></span>
+						<span>夜间</span>
+					</div>										
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		(function(){
+			     //  全局变量
+			      var Chapter_id =1;
+			      var Chapters ='';
+			      var ScreenWidth = window.screen.width ;
+			      var ScreenHeight = window.screen.height ;
+			  // 工具类 和 函数
+			 var utils = (function(){
+				        var oBox = document.querySelectorAll('.box')[0];
+				        var oHeader = document.querySelector('#header');
+				        var oClickMask = document.querySelector('#clickMask');
+				        var oContent = document.querySelector('#content');
+				        var oControles = document.querySelector('#controles');
+				        var oCategory = document.querySelectorAll('.category')[0];
+				        var oFont = document.querySelectorAll('.font')[0];
+				        var oNightOrday = document.querySelectorAll('.nightOrday')[0];
+				        var ofBox = document.querySelectorAll('.fBox')[0];
+				        var oPage = document.getElementById('page');
+				        var oNextPage  = document.getElementById('nextPage');
+				        var oPrevPage  = document.getElementById('prevPage');
+				        var oWords = document.getElementById('words');
+				        var oChapters = document.getElementById('chapters');
+				        var oChapterBox = document.getElementById('oChapterBox');
+				        var oMaskOfchapterBox = document.getElementById('maskOfchapterBox');
+				        var oupNdown = document.getElementById('upNdown');
+				        //数据解密
+						function getBSONP(url, callback) {
+									return $.jsonp({
+										url : url,
+										cache : true,
+										// 注意这里的callback 不是getBSONP传进来的回调函数，而是$.jsonp 方法里面封装的去掉把字符串当js 语句的那个头部分
+										callback : "duokan_fiction_chapter",
+										success : function(result) {
+											
+											var data = $.base64.decode(result);
+											var json = decodeURIComponent(escape(data));
+											// 这里回调函数的参数json 是在getBSONP 内部新创建的变量json
+											// 这里的callback 是function(data) {callback && callback(data);}) 这个整体
+											callback(json);
+										}
+									});
+						      }
+				            
+				        function myLocalstorage(key , value){
+				        	 var prefix = 'h5_reader_';
+				        	 if(arguments.length==1){
+				        	 	return localStorage.getItem(prefix+key);
+				        	 }else{
+				        	 	localStorage.setItem(prefix+key,value);
+				        	 }
+				        }
+				            return {
+				            	'oHeader':oHeader ,
+				            	'oBox':oBox ,
+				            	'oClickMask':oClickMask ,
+				            	'oContent':oContent ,
+				            	'oControles':oControles ,
+				            	'oCategory':oCategory ,
+				            	'oFont':oFont ,
+				            	'oNightOrday':oNightOrday ,
+				            	'ofBox':ofBox ,
+				            	'oPage':oPage ,
+				            	'oNextPage':oNextPage,
+				            	'oPrevPage':oPrevPage,
+				            	'oWords':oWords,
+				            	'oChapters':oChapters,
+				            	'oChapterBox':oChapterBox,
+				            	'oMaskOfchapterBox':oMaskOfchapterBox,
+				            	'oupNdown':oupNdown,
+				            	'getBSONP':getBSONP,
+				            	'myLocalstorage':myLocalstorage,
+				            };
+			                  })();
+			         
+			  function clickToggle(obj){
+				     	 if(getComputedStyle(obj,null)['display']=='none'){ 
+			                 obj.style.display ='block';
+			             }else{
+			       	         obj.style.display ='none';
+			             }
+				     }
+			 
+			  function clickActive(obj,activeName){
+			          	var parent = obj.parentNode ;
+			            for(var i =0 ; i<  parent.children.length ;i++){
+				          	 var oldClass =  parent.children[i].className  ;			          	 
+				          	   if(oldClass.indexOf(activeName)!=-1){
+				          	   	  var arr = oldClass.split(' ');
+				          	   	  var arr2 =[];
+					          	   	   for(var j=0;j<arr.length ;j++){
+					          	   	   	    if(arr[j] == activeName){
+					          	   	   	    	continue ;
+					          	   	   	    }
+					          	   	   	   arr2[j] = arr[j];   
+					          	   	   }
+					          	   oldClass = arr2.join(' '); 
+					          	 parent.children[i].className= oldClass ; 
+				          	   }			          	   
+			           }
+			            
+			            obj.className +=' '+ activeName;
+			          }
+			  
+			  function fontNbgColor(obj){
+		             	 var spanofWhat = obj.children[0].innerHTML ;
+		                for(var i = 0 ;i< obj.children.length;i++){		              	   
+		              	   if(obj.children[i].innerHTML =='字号'||obj.children[i].innerHTML =='背景')
+		              	     continue ;
+		              	    obj.children[i].addEventListener('click',function(){
+		              	  	  var _this = this ;
+		              	  	   if(spanofWhat=='字号'){
+		              	  	   	    utils.oContent.style.fontSize= getComputedStyle( utils.oContent, null)['fontSize'] ;		              	  	 
+				              	  	  var fontsize = parseInt(utils.oContent.style.fontSize);
+				              	  	  if( _this.innerHTML =='大号'){
+				              	  	  	    if(fontsize > 32)  return ;
+				              	  	  	 utils.oContent.style.fontSize =(fontsize+1)  +'px' ;
+				              	  	  }
+				              	  	  if( _this.innerHTML =='小号'){
+				              	  	  	    if(fontsize < 10)  return ;
+				              	  	  	 utils.oContent.style.fontSize =(fontsize-1)  +'px' ;
+				              	  	  }
+				              	  	 if(utils.oContent.style.fontSize){
+				              	  	 	utils.myLocalstorage('contentfontsize',utils.oContent.style.fontSize);
+				              	  	 }
+				              	  	  
+		              	  	   }
+		              	  	  
+		              	  	   if(spanofWhat=='背景'){
+		              	  	   	    
+		              	  	   	    utils.oContent.style.backgroundColor =  _this.style.backgroundColor;
+		              	  	   	    clickActive( _this,'bgColorActive');
+		              	  	   	    
+		              	  	   	    if(utils.oContent.style.backgroundColor){
+		              	  	   	    	utils.myLocalstorage('contentBgColor',utils.oContent.style.backgroundColor);
+		              	  	   	    }
+		              	  	   	    
+		              	  	   }
+		              	  },false);
+		              }
+		             
+		             }
+			  
+			   
+			   //章节页面的显示和隐藏
+			   function ChaptersToggle(){
+	                            if(utils.oChapters.style.transform == 'translateX(-100%)'|| utils.oChapters.style.transform == ''){
+	                         	
+			            		utils.oChapters.style.transform = 'translateX(0%)';
+			            		utils.oChapters.style.height  ='auto';
+			            		
+			            	   }else{
+			            	   	console.log('位移2'+utils.oChapters.style.transform);
+			            		utils.oChapters.style.transform = 'translateX(-100%)';
+			            	 	utils.oChapters.style.height =ScreenHeight + 'px';
+			            	 }		
+                          }
+			   
+			   
+			   
+			    // 初始化函数
+		      function init(){
+		      	//  保存用户设置后的背景颜色和文字大小
+			 	 if(utils.myLocalstorage('contentBgColor')){
+			 	 	 utils.oContent.style.backgroundColor = utils.myLocalstorage('contentBgColor');
+			 	 	
+			 	 }
+			 	 if(utils.myLocalstorage('contentfontsize')){
+			 	 	 utils.oContent.style.fontSize = utils.myLocalstorage('contentfontsize');
+			 	 }
+			 	 
+			 	  // 保存用户看到的章节 ,默认从第一章开始
+			 	  if(utils.myLocalstorage('Chapter_id')){			    
+			    
+			     	  Chapter_id =  parseInt( utils.myLocalstorage('Chapter_id'),10)  ;
+			      }
+		      }
+			 // 入口函数,main 
+			 var main= (
+			 	   function (){
+			 	   	        // 初始化
+			 	            init();
+			 	            dataNview();
+			 	          
+			             })();
+			 // 数据交互
+			  function ReaderModel1(){
+			  	       
+			  	       var init = function(UIcallback){
+			  	       	         getChapters(function(){
+			  	       	         	getChapterContent(Chapter_id,function(data){
+			  	       	         		UIcallback && UIcallback(data);
+			  	       	         		
+			  	       	         	});
+			  	       	         });
+			  	       }
+			 	       var getChapters = function(callback){
+			 	       	   $.get('data/chapter.json',function(data){
+			 	       	   	        console.log(Chapter_id);
+			 	       	   	        // 第一次的时候讲章节内容存在全局变量里面并且渲染章节页
+			 	       	   	        if(Chapters==''){
+			 	       	   	        	  Chapters = data;
+			 	       	   	        	  RenderBaseChapters(utils.oChapters);
+			 	       	   	        }
+			 	       	   	       
+			 	       	   	        Chapter_id = data.chapters[ Chapter_id ].chapter_id ;
+			 	       	   	     
+			 	       	   	        callback && callback();
+			 	       	   	       
+			 	       	   	        
+			 	       	   },'json');
+			 	       }
+			 	  
+			 	       var getChapterContent = function(chapter_id,callback){
+			 	       	   $.get('data/data'+chapter_id+'.json',function(data){
+			 	       	   	     // 如果服务器状态为0 
+			 	       	   	     if (data.result == 0) {
+										var url = data.jsonp;
+										utils.getBSONP(url, function(data) {
+											// 通过这种包一层的函数方式将真正的json 转码后的数据传给UI渲染层
+										    callback && callback(data);
+									     
+								          });
+			 	       	   	      }
+			 	       	   	     
+			 	       	   },'json');
+			 	       }
+			 	       	   
+			 	       	 return {
+			 	       	 	 init:init ,
+			 	       	 };
+			    }
+			 
+			   
+			   function dataNview(){
+			   	 var ReaderModel = ReaderModel1();                 // 暴露内部的init 接口
+			     var ReaderUI = RenderBaseFrame(utils.oWords);     // 拿到处理数据的函数
+			 	    ReaderModel.init(function(data){               // 在取回的数据中使用UI渲染函数
+			 	                	ReaderUI(data);
+			 	                }) ;
+			 	                 // 将整个网页滚动到顶部
+		             	       window.scrollTo(0, 0);
+			   }
+			   
+			 // 业务逻辑,事件绑定
+			  var contoller =(
+			  	  function(){
+			  		  
+			  		  // 点击唤出控制层
+			  		  utils.oClickMask.addEventListener('click',function(){			    	 			    	
+			    	       clickToggle(utils.oHeader);
+			    	       clickToggle(utils.oControles);
+			       },false);
+			  
+			        // 字体大小和背景颜色
+			        utils.oFont.addEventListener('click',function(){					     
+					          clickToggle(utils.ofBox);			          			         
+					          clickActive(this,'controlesActive');			          
+					           // 字号大小调节
+				             var oDivFontsize =  utils.oControles.getElementsByClassName('fontsize')[0];  
+				             fontNbgColor(oDivFontsize);
+				              // 背景颜色设置
+				             var oDivbgColor = utils.oControles.getElementsByClassName('bgColor')[0];
+				               fontNbgColor(oDivbgColor);
+					 },false);
+			  	    
+			  	      
+			  	      // 滚动的时候隐藏控制台和头部
+			  	     window.addEventListener('scroll',function(){
+			  	     	     
+			  	     	 	utils.oHeader.style.display ='none';
+			  	     	    utils.oControles.style.display ='none';
+                                                     
+			  	     },false);
+		         
+		         
+		             //  上下 章节
+		             utils.oPrevPage.addEventListener('click',function(){
+		             	    if(Chapter_id>1){
+		             	    	Chapter_id -- ;
+		             	    	  // 存储当前页
+		             	    	utils.myLocalstorage('Chapter_id',Chapter_id);
+		             	    }
+		             	   dataNview();
+		             	        
+		             },false);
+		             utils.oNextPage.addEventListener('click',function(){
+		             	    if(Chapter_id < 4){
+		             	    	Chapter_id ++  ;
+		             	    	utils.myLocalstorage('Chapter_id',Chapter_id);
+		             	    }
+		             	    
+		             	  dataNview();
+		             	
+		             },false);
+		             
+		            // 目录按钮点击展开目录页
+		            utils.oCategory.addEventListener('click',function(){
+
+                            ChaptersToggle();
+		            },false);
+		             
+		             //章节页面的遮罩层点击事件
+		             utils.oMaskOfchapterBox.addEventListener('click',function(){
+			       	                
+			       	                ChaptersToggle();
+			       	        	
+			       	        	      //  头尾控制器消失
+                                clickToggle(utils.oHeader);
+			    	            clickToggle(utils.oControles);
+			       	        },false);
+			  	    
+			  	  // 快速到顶部或者底部
+			  	   utils.oupNdown.addEventListener('click',function(){
+			  	   	      if(this.className=='down'){
+			  	   	      	this.className='up';
+			  	   	      	window.scrollTo(0, 0);
+			  	   	      }else{
+			  	   	      	this.className='down' ;
+			  	   	     	window.scrollTo(0, (utils.oContent.clientHeight+utils.oPage.clientHeight) - ScreenHeight);
+			  	   	      }
+			  	   },false);
+			  	   
+			  	  
+			  	 }
+			  )();
+			  
+			 // UI渲染 
+			          //内容渲染
+					  function RenderBaseFrame(container) {
+							function parseChapterData(jsonData) {
+								var jsonObj = JSON.parse(jsonData);
+								var html = "<h4>" + jsonObj.t + "</h4>";
+								for (var i = 0; i < jsonObj.p.length; i++) {
+									html += "<p>" + jsonObj.p[i] + "</p>";
+								}
+								return html;
+							}
+		
+							return function(data) {
+								container.innerHTML = parseChapterData(data);
+							};
+						}
+			       // 标题章节页渲染
+			       function  RenderBaseChapters(container){
+			       	    console.log(Chapters);
+			       	    container.children[0].innerHTML = Chapters.title;
+			       	    var chaptersLength = Chapters.chapters.length ;
+			       	    var chaptersHtml ;
+			       	    
+			       	    
+			       	    for(var i =0 ;i<chaptersLength ;i++){
+			       	    	  Chapters.chapters[i].title
+			       	    	  chaptersHtml +=        '<span price=' + Chapters.chapters[i].price 
+			       	    	                          + ' id='+Chapters.chapters[i].chapter_id 
+			       	    	                          + ' wordcount='+Chapters.chapters[i].word_count
+			       	    	                          +' free='+Chapters.chapters[i].free			       	   	                      
+			       	    	                          +'>' + Chapters.chapters[i].title 			       	    	                          
+			       	    	                          +'</span>' ;
+			       	    }
+			       	    container.children[1].innerHTML += chaptersHtml ;			       	  
+			     
+			       	    
+			       	       // // 通过当前的身上的id 属性就可以去任何一章 
+			       	   for(var j =0 ;j< container.children[1].children.length ;j++){
+			       	   	    container.children[1].children[j].addEventListener('click',function(){
+			       	   	    				       	   	    	     
+			       	   	    	       if((parseInt(this.id)+1) < 5){
+			       	   	    	       	  Chapter_id = parseInt(this.id)+1 ;
+			       	   	    	       	  dataNview();
+			       	   	    	         ChaptersToggle();
+			       	   	    	       }else{
+			       	   	    	       	  alert('sorry 此章节暂时没有更新') ;
+			       	   	    	       }
+			       	   	    	       
+			       	   	    	       //  头尾控制器消失
+			       	   	    	      utils.oHeader.style.display = 'none';
+			    	                  utils.oControles.style.display = 'none';
+			       	   	    },false);
+			       	   }
+			       	   
+			       	   
+			       }
+			       
+		})();
+	</script>
+</html>
