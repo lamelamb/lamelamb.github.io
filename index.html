@@ -2,100 +2,156 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-		<title>动态表格</title>
-		
+		<title>test</title>
+		<!--  最新版本的 Bootstrap  css  -->
+          <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+         <style>
+         	*{
+         		margin:0 ;
+         		padding: 0;
+         	}
+         	html{
+         		font-size:16px;
+         		font-family: "arial, helvetica, sans-serif";
+         	}
+         	[v-cloak] {
+             display: none;
+             }
+         	.cart{
+         		margin-top: 10%;
+         	}
+            .cart table button{
+            	border: none;
+            	background: lightskyblue;
+            	
+            }
+            .cart .desc{
+            	position: relative;
+            }
+            .cart .desc  img{
+            	width:21px;
+            	height:21px;
+            	position: absolute;
+            	right:10%;
+            	cursor: pointer;
+            }
+            
+         </style>
 	</head>
-        <style>
-             *{ 
-              margin:0;
-              padding:0;
-                }
-            #box{
-            	width: 50%;
-            	margin:  100px auto;
-            }
-            table{
-            	margin-bottom: 50px;
-            }
-        </style>
-	<body>
-		<div id="box">
-			<table id="tb1">
-				<thead>
-					<tr>
-						<th>name</th>
-						<th>sex</th>
-						<th>爱好</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>lamb</td>
-						<td>1</td>
-						<td>&nbsp;</td>
-					</tr>
-					<tr>
-						<td>goat</td>
-						<td>0</td>
-						<td>&nbsp;</td>
-					</tr>
-					<tr>
-						<td>sheep</td>
-						<td>0</td>
-						<td>&nbsp;</td>
-					</tr>
-				</tbody>
-			</table>
-			<div>
-			   name:<input type='text' id="name"/>
-			   <input type="button" id="add" value="添加"/>
-			</div>
-		</div>
-		<script>
-			    var oTable = document.getElementById('tb1');
-			    var rows = oTable.tBodies[0].rows ;
-			    var oName = document.getElementById('name');
-			    var oAdd = document.getElementById('add');
-			    var arr = [] ;
-			   
-			   // 出入行obj ，是一个数组
-			   function bgColor(rows){
-			   	var oldColor = null ;
-			   	for(var i= 0 ; i<rows.length;i++ ){
-			   		if(i%2==0){
-			   			rows[i].style.background ="lightgreen";
-			   		}
-			   		
-			    	 rows[i].onmouseover = function(){
-			    	 	// 用一个容器将原来的color 存储起来
-			    	 	oldColor = this.style.backgroundColor ;
-			    	 	 this.style.background = 'lightblue' ;
-			    	 	 this.style.color = 'white' ;
-			    	 }
-			    	 rows[i].onmouseout = function(){
-			    	 	//  离开时 显示 原来的颜色 
-			    	 	 this.style.background = oldColor ;
-			    	 	 this.style.color = 'black' ;
-			    	 }
-			    	
-			    }
-			   }
-			    
-			    
-			    bgColor(rows);
-			    
-			     oAdd.onclick = function(){
-			     	 rows = oTable.tBodies[0].rows ;			     	
-			        var oTr = document.createElement('tr');
-			                        
-                   oTr.innerHTML = '<td>'+ (rows.length +1) +'</td>'
-                                   +'<td>'+ oName.value +'</td>'
-                                   +'<td>'+ '&nbsp;' +'</td>' ;
-                     oTable.tBodies[0].appendChild( oTr);
-			     	  oName.value ='' ;
-			     	  bgColor(rows);
-			     }
-		</script>
+	<body>		
+		    <div id="box" v-cloak>
+		    	<div class="container">
+		    		<div class="row cart">
+		    			<div class="col-md-8 col-md-offset-2">
+		    				<table class="table table-hover table-bordered">
+		                       <tr>
+		                       	<th>全选<input  type="checkbox" :checked="isTrue" @click="selectAll"/></th>
+		                       	<th>商品序号</th>
+		                       	<th>描述</th>
+		                       	<th>价格</th>
+		                       	<th>操作</th>
+		                       </tr>
+		                       <tr v-for="( book , index) in books">
+		                       	<td>选中  <input  type="checkbox" :value="book" v-model="selected" @click="selectOne(book)"/></td>
+		                       	<td>{{ book.num}}</td>
+		                       	<td class="desc">
+		                       		<book-detail :title="book.title"></book-detail>
+		                       		<img :src=" book.url "/>
+		                       	</td>
+		                       	<td>{{ book.price | yuan}}</td>
+		                       	<td>
+		                       		<!--删除当前的 书籍最简单就是根据index 删除  ；另外一个是根据book 比较删除,这里测试book 删出方法-->
+		                       		<button type="button" class="btn btn-danger btn-sm" @click="remove(book)">删除</button>
+		                       	</td>
+		                       </tr>
+		                       <tr>
+		                         <td colspan="5">
+		                         	<span>您总共选择{{ selected.length }}本书</span>
+		                         	<span>总价格为{{ sum  | yuan }}</span>
+		                         </td>
+		                       </tr>  
+		    				</table>
+		    			</div>
+                    </div>
+		    	</div>
+		    </div>
 	</body>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	 <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+          <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+          <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+          <!-- vue -->
+	      <script src="https://cdn.bootcss.com/vue/2.4.2/vue.min.js"></script>
+	<script>
+		
+		let vm = new Vue({
+			  created: function () {
+			  	 axios({
+					  method:'get',
+					  url:'mock/cart.json',
+					  responseType:'json'
+					})
+					  .then(function(response) {
+					      vm.books =  response.data.books ;
+					      console.log(vm.books)
+					    
+					});
+			  } ,
+			  data:{
+			  	 books:[],
+			  	 selected:[],
+			  	 isTrue:false,
+			  } ,
+			 computed:{
+			 	 sum:function(){
+			 	 	//  使用的es6 的数组展开语法 和reduce函数求和的方法( 对于数组存对象这种形式 )
+			 	 	 return [0, ...this.selected].reduce((prev,next)=>prev+next.price);
+			 	 }
+			 },
+			 filters:{
+			 	yuan:function(price){
+			 		return '￥'+price.toFixed(2) ;
+			 	},
+			 },
+			 methods:{
+			 	// es6 写法省略冒号和 function 关键字
+			 	remove(book){
+			 		this.books = this.books.filter(item=>item!==book); 
+			 		//删除了book , 如果是为选中的没有印象，如果是选中的，则selected 也要同步更新
+			 		this.selected = this.selected.filter(item=>item!==book); 
+			 	},
+			 	selectAll(){
+			 		  if(this.selected.length!== this.books.length){
+			 		  	this.selected = this.books.map(item=>item);
+			 		  	this.isTrue=true ;
+			 		  }else{
+			 		  	this.selected =[];
+			 		  	this.isTrue=false ;
+			 		  }
+			 
+			 	},
+			 	selectOne(book){
+			 		  // 数据双向绑定，让我不用考虑self的选择情况,只考虑对全选的影响
+			 		   console.log(this.selected);
+				 		 if( this.selected.includes(book)  && this.selected.length == this.books.length){
+				 		  	  this.isTrue=true;
+				 		  }else{
+				 		  	this.isTrue=false;
+				 		  }
+			 	    },
+			    } ,
+		     components:{
+		       	'bookDetail':{
+		       		 props:{
+		       		 	title:{
+		       		 		type:[String],
+		       		 		require:true ,
+		       		 	},
+		       		 },
+		       		 template:'<span>{{title}}<span>',
+		       	} ,
+		       }
+		});
+		vm.$mount('#box');
+	</script>
 </html>
