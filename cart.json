@@ -1,0 +1,9 @@
+{
+	"msg"  :"IT书籍列表",
+	"books":[
+		     {"num":"0001","title":"Vue2实践揭秘", "price":15.00 ,"url":"https://img11.360buyimg.com/n1/s200x200_jfs/t4540/29/2949953861/229268/af148d19/58f4ec87N10cf0e3a.jpg"},
+		     {"num":"0002","title":"Vue.js实战 ", "price":10.00 ,"url":"http://img14.360buyimg.com/n1/s200x200_jfs/t9508/97/2285719018/62961/99c5b1b7/59f299b4Nc9e78adb.jpg"},
+		     {"num":"0003","title":"Vue移动开发", "price":12.20 ,"url":"http://img13.360buyimg.com/n1/s200x200_jfs/t13543/126/1377736759/247106/88585939/5a45a1beN826f1e48.jpg"},
+		     {"num":"0004","title":"Vue开发宝典", "price":25.40 ,"url":"//img11.360buyimg.com/n1/s200x200_jfs/t19438/216/878565340/75099/b8cfc597/5aaf71d5N6e5f2a58.jpg"}
+	      ]
+}
