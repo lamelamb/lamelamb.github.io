@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>轮播图，jquery版,通过class 的变化实现</title>
+		<script src="http://cdn.static.runoob.com/libs/jquery/1.10.2/jquery.min.js"></script>
+		<link rel="stylesheet"  href="css/banner.css" />
+	</head>
+	<body>
+		<div class="banner">
+			<ul>
+				<li class="first"><img src="http://img3.imgtn.bdimg.com/it/u=2721859087,2474842230&fm=27&gp=0.jpg"/></li>
+				<li class="second"><img src="http://img0.imgtn.bdimg.com/it/u=1230799154,4259669654&fm=27&gp=0.jpg"/></li>
+				 <li class="third"><img src="http://img2.imgtn.bdimg.com/it/u=500808421,1575925585&fm=200&gp=0.jpg"></li>
+				 <li><img src="http://img0.imgtn.bdimg.com/it/u=1449811486,2346320630&fm=27&gp=0.jpg"></li>
+				 <li><img src="http://img0.imgtn.bdimg.com/it/u=1945953527,290927443&fm=27&gp=0.jpg"></li>
+				 <li><img src="http://img4.imgtn.bdimg.com/it/u=2820690524,571467704&fm=27&gp=0.jpg"></li>
+			</ul>
+			<div class="btns">
+				<div class="left">&lt;</div>
+				<div class="right">&gt;</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		$(function(){
+			var  $banner = $('.banner'),
+			 $aLi =  $('.banner li'),
+			 $leftBtn = $('.btns .left'),
+			 $rightBtn = $('.btns .right') ;
+			// 获取所有的位置，大小，透明度信息
+		 var arrW=[] ,arrH=[] ,arrL=[] ,arrT=[] , arrO =[];
+			 $aLi.each(function(index ,item ){
+//			   	 arrW[index]  =  $(this).css('width');
+//               arrH[index] =   $(this).css('height');
+//               arrL[index] =   $(this).css('left');
+//               arrT[index] =   $(this).css('top');
+//				 arrO[index] =   $(this).css('opacity');
+				 this.setAttribute('index' ,index+1);
+			 });
+
+			 // 点击事件
+			  $leftBtn.click(function(){
+                    move(-1);
+                 });
+			  $rightBtn.click(function(){
+                    move(1);
+                 });
+			function move(direction){
+				if(direction == -1){    // 朝左
+					
+					$('li.first').removeClass("first") ;
+					
+					$('li.second').removeClass("second").addClass('first');
+				
+					 
+					  $('li.third').removeClass("third").addClass('second');
+					  $('li.second').next().addClass('third');
+					 
+					    
+					  var lisecIndex = $('li.second')[0].getAttribute('index');
+					   if( lisecIndex  == 6){
+					   	  $('.banner li[index ="1"]').addClass('third');
+					   }
+					   var lifirIndex = $('li.first')[0].getAttribute('index');
+					   if( lifirIndex  == 6){
+					   	  $('.banner li[index ="1"]').addClass('second');
+					   }
+					
+				  }else{
+              
+                      var lifirIndex = $('li.first')[0].getAttribute('index');
+				     if(lifirIndex  == 1){
+				     	$('li.first').removeClass("first");
+				     	$('.banner li[index ="6"]').addClass('first');
+				     }else{
+				     	$('li.first').removeClass("first").prev().addClass('first');
+				     }
+                       var lisecIndex = $('li.second')[0].getAttribute('index');
+                        if(lisecIndex  == 1){
+				     	$('li.second').removeClass("second");
+				     	$('.banner li[index ="6"]').addClass('second');
+				     }else{
+				     	$('li.second').removeClass("second").prev().addClass('second');
+				     }
+				      
+				      var lithiIndex = $('li.third')[0].getAttribute('index');
+				     if(lithiIndex  == 1){
+				     	$('li.third').removeClass("third");
+				     	$('.banner li[index ="6"]').addClass('third');
+				     }else{
+				     	$('li.third').removeClass("third").prev().addClass('third');
+				     }
+				     
+				      
+					  
+				  }
+				
+			}
+      
+			
+		});
+		
+		
+	</script>
+</html>

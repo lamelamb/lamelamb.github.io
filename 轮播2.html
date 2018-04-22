@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>轮播图，jquery版,通过动画的实现</title>
+		<script src="http://cdn.static.runoob.com/libs/jquery/1.10.2/jquery.min.js"></script>
+		<link rel="stylesheet"  href="css/banner2.css" />
+	</head>
+	<body>
+		<div class="banner">
+			<ul>
+				<li><img src="http://img3.imgtn.bdimg.com/it/u=2721859087,2474842230&fm=27&gp=0.jpg"/></li>
+				<li><img src="http://img0.imgtn.bdimg.com/it/u=1230799154,4259669654&fm=27&gp=0.jpg"/></li>
+				 <li><img src="http://img2.imgtn.bdimg.com/it/u=500808421,1575925585&fm=200&gp=0.jpg"></li>
+				 <li><img src="http://img0.imgtn.bdimg.com/it/u=1449811486,2346320630&fm=27&gp=0.jpg"></li>
+				 <li><img src="http://img0.imgtn.bdimg.com/it/u=1945953527,290927443&fm=27&gp=0.jpg"></li>
+				 <li><img src="http://img4.imgtn.bdimg.com/it/u=2820690524,571467704&fm=27&gp=0.jpg"></li>
+			</ul>
+			<div class="btns">
+				<div class="left">&lt;</div>
+				<div class="right">&gt;</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		// 本质上就是 三种状态的循环控制 ，大视图前，大视图 ，大视图后
+		$(function(){
+			var  $banner = $('.banner'),
+			 $aLi =  $('.banner li'),
+			 $leftBtn = $('.btns .left'),
+			 $rightBtn = $('.btns .right') ;
+			 var iNow = 1 ;
+			  var timer ;
+			// 获取所有的位置，大小，透明度信息
+		 var arrW=[] ,arrH=[] ,arrL=[] ,arrT=[] , arrO =[];
+			 $aLi.each(function(index ,item ){
+//			   	 arrW[index]  =  $(this).css('width');
+//               arrH[index] =   $(this).css('height');
+//               arrL[index] =   $(this).css('left');
+//               arrT[index] =   $(this).css('top');
+//				 arrO[index] =   $(this).css('opacity');
+				 this.setAttribute('index' ,index+1);
+			 });
+
+			 // 点击事件
+			  $leftBtn.click(function(){
+			  	 clearTimeout(timer);
+			  	   timer = setTimeout(function(){
+			  	   	     move(-1);
+			  	   },300);
+                   
+                 });
+			  $rightBtn.click(function(){
+                    clearTimeout( timer );
+				  	    timer = setTimeout(function(){
+				  	   	     move(1);
+				  	   },300);
+                   
+                 });
+                 
+             function  init(){
+             	// 三种状态，视图前，视图 ，试图后
+              $aLi.eq(0).animate({
+              	 top:'50px',
+	             left:'0',
+	             width:'200px',
+	             height:'200px',
+              	
+              },'slow');
+              
+             	$aLi.eq(1).animate({
+              	 top:'0px',
+	             left:'200px',
+	             width:'500px',
+	             height:'300px',
+	             opacity:'1' 
+              },'slow');
+              
+              $aLi.each(function(){
+              	  if($(this).attr('index') =='0'   || $(this).attr('index')=='1' ) 
+              	    return true ;
+              	
+              	  $(this).css({
+	              	 top:'50px',
+		             left:'700px',
+		              width:'200px',
+		             height:'200px',
+	                });
+              });
+              
+//           	$aLi.eq(2).css({
+//            	 top:'50px',
+//	             left:'700px',
+//	              width:'200px',
+//	             height:'200px',
+//            });
+             	
+             }
+                 
+               init();  
+                 
+			function move(direction){
+				if(direction == -1){    // 朝左
+					 iNow ++ ;
+					 
+		              if(iNow == 5){
+					 	$aLi.eq(0).css({
+			              	 top:'50px',
+				             left:'700px',
+				              width:'200px',
+				              height:'200px',
+			              });
+					 }
+		           
+					if(iNow==6){
+						iNow =0 ;
+						$aLi.eq(5).animate({
+			              	 top:'50px',
+			                 left:'0',
+			                  width:'200px',
+			                  height:'200px',
+			              },'slow'); 
+
+			              
+					}
+					
+					if(iNow > 0){
+					 	$aLi.eq(iNow).prev().animate({
+		              	 top:'50px',
+		                 left:'0',
+		                  width:'200px',
+		                  height:'200px',
+		              },'slow'); 
+					 }
+					 $aLi.eq(iNow).animate({
+		              	 top:'0px',
+			             left:'200px',
+			             width:'500px',
+			             height:'300px',
+			             opacity:'1' 
+		              },'slow'); 
+		               $aLi.eq(iNow).next().css({
+		              	 top:'50px',
+			             left:'700px',
+			             width:'200px',
+			             height:'200px',
+		              },'slow');
+					
+					console.log(iNow);
+					
+				    }else{
+				    	
+				    	 iNow -- ;
+				    	 
+                      if(iNow<0){
+                      	 iNow =5 ;
+                      }
+                      if(iNow ==5 ){
+                      	$aLi.eq(0).animate({
+	              	     top:'50px',
+			             left:'700px',
+			             width:'200px',
+			             height:'200px',
+	                   },'slow'); 
+                      }
+                      
+                      
+                     if(iNow == 0){
+                     	$aLi.eq(5).css({
+			              	 top:'50px',
+				             left:'0px',
+				              width:'200px',
+				              height:'200px',
+			              });
+			            
+			              
+                     }
+                     
+                     if( iNow > 0){
+	                     	$aLi.eq(iNow).prev().css({
+			              	    top:'50px',
+				                left:'0px',
+				                 width:'200px',
+				                 height:'200px', 
+			              }); 
+                     }
+					$aLi.eq(iNow).animate({
+	              	     top:'0px',
+			             left:'200px',
+			             width:'500px',
+			             height:'300px',
+			             opacity:'1' 
+	              },'slow'); 
+                   $aLi.eq(iNow).next().animate({
+		              	     top:'50px',
+				             left:'700px',
+				             width:'200px',
+				             height:'200px',
+		                   },'slow');
+                    
+                       
+                    console.log(iNow);
+				
+			           }
+         
+			 
+			
+			  }
+			
+			
+		});
+		
+		
+	</script>
+</html>
